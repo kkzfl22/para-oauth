@@ -18,16 +18,18 @@ public class TestCacheKeyValue {
     @Test
     public void testCache() {
         CacheKeyValue<String, String> instance = new CacheKeyValue<>();
-        instance.putObject("11", "22");
-        Assertions.assertEquals(instance.getObject("11"), "22");
-
+        instance.put("11", "22");
+        Assertions.assertEquals(instance.get("11"), "22");
         //执行保存
-        instance.writeDataObjectDefault();
+        instance.DefaultSave();
         //加载
-        instance.readDataObjectDefault();
+        instance.defaultLoader();
+        Assertions.assertEquals(instance.get("11"), "22");
 
-        Assertions.assertEquals(instance.getObject("11"), "22");
+        instance.remove("11");
+        instance.put("11", "33");
 
+        Assertions.assertEquals(instance.get("11"), "33");
 
     }
 

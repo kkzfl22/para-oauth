@@ -20,7 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 进行永久缓存器的实现,此缓存只会加不会减
  * <p>
- * 高速键值对缓存器的简单实现类<br>
  * 本类利用key的HashCode和分流器大小简单求余来分流,使得不依赖一个对象同步锁,提高性能
  *
  * @author liujun
@@ -89,7 +88,7 @@ public class CacheKeyValue<K, V> {
         }
 
         // 当数容器启动完成，需要加载数据
-        this.readDataObjectDefault();
+        this.defaultLoader();
     }
 
 
@@ -126,8 +125,8 @@ public class CacheKeyValue<K, V> {
      * @return 原始值
      * @see [类、类#方法、类#成员]
      */
-    public void putObject(K key, V value) {
-        getCache(key).put(key, value);
+    public void put(K key, V value) {
+        indexForMap(key).put(key, value);
     }
 
     /**
@@ -137,8 +136,8 @@ public class CacheKeyValue<K, V> {
      * @return Object 值
      * @see [类、类#方法、类#成员]
      */
-    public V removeObject(K key) {
-        return getCache(key).remove(key);
+    public V remove(K key) {
+        return indexForMap(key).remove(key);
     }
 
     /**
@@ -148,18 +147,18 @@ public class CacheKeyValue<K, V> {
      * @return Object 值
      * @see [类、类#方法、类#成员]
      */
-    public V getObject(K key) {
-        return getCache(key).get(key);
+    public V get(K key) {
+        return indexForMap(key).get(key);
     }
 
     /**
-     * 根据Key的HashCode获取指定的分流缓存对象
+     * 定位到存储数据的map
      *
      * @param key 键
      * @return 分流缓存对象
      * @see [类、类#方法、类#成员]
      */
-    private Map<K, V> getCache(K key) {
+    private Map<K, V> indexForMap(K key) {
         return mapCache[indexFor(key.hashCode(), corePoolSize)];
     }
 
@@ -175,14 +174,14 @@ public class CacheKeyValue<K, V> {
     /**
      * 默认的文件路径读取
      */
-    public void readDataObjectDefault() {
+    public void defaultLoader() {
         InputStream inputStream = getFileInputStream(DEFAULT_PATH + DEFAULT_NAME);
         //如果为空，则跳过
         if (null == inputStream) {
             return;
         }
         //读取数据
-        this.readDataObject(inputStream);
+        this.loader(inputStream);
     }
 
 
@@ -200,13 +199,12 @@ public class CacheKeyValue<K, V> {
         if (null == input) {
             input = CacheKeyValue.class.getClassLoader().getResourceAsStream(absPath);
         }
-        if (input == null) {
+        if (null == input) {
             input = CacheKeyValue.class.getResourceAsStream(absPath);
         }
-        if (input == null) {
+        if (null == input) {
             input = Thread.currentThread().getContextClassLoader().getResourceAsStream(absPath);
         }
-
 
         return input;
     }
@@ -224,7 +222,7 @@ public class CacheKeyValue<K, V> {
         }
         // 当外部文件不存在时，会报出文件不存在异常，此异常需忽略，后续加载内置文件即可
         catch (FileNotFoundException e) {
-            log.info("out file not exists :" + path);
+            log.info("out file not exists : {}", path);
         }
 
         return outFileStream;
@@ -233,16 +231,16 @@ public class CacheKeyValue<K, V> {
     /**
      * 数据的加载操作
      */
-    public void readDataObject(InputStream inputStream) {
+    public void loader(InputStream inputStream) {
         try (BufferedInputStream bufferInput = new BufferedInputStream(inputStream);
              ObjectInputStream ooRead = new ObjectInputStream(bufferInput)) {
             mapCache = (ConcurrentHashMap<K, V>[]) ooRead.readObject();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            log.error("CacheKeyValue readDataObject ClassNotFoundException", e);
+            log.error("CacheKeyValue loader ClassNotFoundException", e);
         } catch (IOException e) {
             e.printStackTrace();
-            log.error("CacheKeyValue readDataObject IOException", e);
+            log.error("CacheKeyValue loader IOException", e);
         } finally {
             StreamUtils.close(inputStream);
         }
@@ -252,12 +250,18 @@ public class CacheKeyValue<K, V> {
     /**
      * 默认文件的输出操作
      */
-    public void writeDataObjectDefault() {
-        this.writeDataObject(DEFAULT_PATH, DEFAULT_NAME);
+    public void DefaultSave() {
+        this.save(DEFAULT_PATH, DEFAULT_NAME);
     }
 
 
-    public void writeDataObject(String path, String fileName) {
+    /**
+     * 指定路径的写入
+     *
+     * @param path     路径
+     * @param fileName 文件名
+     */
+    public void save(String path, String fileName) {
 
         // 首先检查文件路径，不存在，则创建
         File basePath = new File(path);
@@ -273,16 +277,14 @@ public class CacheKeyValue<K, V> {
             ooWrite.writeObject(mapCache);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            log.error("CacheKeyValue writeDataObject ClassNotFoundException", e);
+            log.error("CacheKeyValue save ClassNotFoundException", e);
         } catch (IOException e) {
             e.printStackTrace();
-            log.error("CacheKeyValue writeDataObject IOException", e);
+            log.error("CacheKeyValue save IOException", e);
         }
     }
 
     public ConcurrentHashMap<K, V>[] getMapCache() {
         return mapCache;
     }
-
-
 }
