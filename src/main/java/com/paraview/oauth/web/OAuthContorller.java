@@ -46,10 +46,16 @@ public class OAuthContorller {
     @GetMapping("/authorize")
     public void authorize(OAuthReq req, ServerWebExchange exchange) {
         //从 cookie获取当前登入信息
-        System.out.println(exchange.getRequest().getCookies().getFirst("oauth-token").getValue());
+        String token = exchange.getRequest().getCookies().getFirst("oauth-token").getValue();
+        req.setToken(token);
         String code = oAuthService.makeCode(req);
         exchange.getResponse().setStatusCode(HttpStatus.FOUND);
-        exchange.getResponse().getHeaders().setLocation(URI.create(req.getRedirect_uri() + "&code=" + code));
+        exchange.getResponse().getHeaders().setLocation(URI.create(req.getRedirect_uri() + "&code=" + code+"&state=" + req.getState()));
+    }
+
+    @GetMapping("/reviceCode")
+    public void reviceCode(String code) {
+        System.out.println("code:" + code);
     }
 
 }

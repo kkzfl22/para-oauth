@@ -1,8 +1,10 @@
-package com.paraview.oauth.client;
+package com.paraview.oauth.context;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.paraview.oauth.bean.Token;
+import com.paraview.oauth.client.ClientApp;
 import com.paraview.oauth.enums.AuthType;
 import com.paraview.oauth.enums.AuthorizeType;
 import com.paraview.oauth.exception.AuthException;
@@ -62,7 +64,7 @@ public class ClientContext {
             return false;
         }
         for (String authorizeType : clientApp.getAuthorizeType().split(String.valueOf(StrUtil.C_COMMA))) {
-            if(authorizeType.equalsIgnoreCase(authType)){
+            if (authorizeType.equalsIgnoreCase(authType)) {
                 return true;
             }
         }
@@ -81,5 +83,10 @@ public class ClientContext {
         return true;
     }
 
+    public ClientApp getClient(String clientId) {
+        if(ObjectUtil.isEmpty(clientId))
+            return null;
+        return clients.get(clientId);
+    }
 
 }

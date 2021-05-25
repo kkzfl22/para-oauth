@@ -1,6 +1,6 @@
 package com.paraview.oauth.config;
 
-import com.paraview.oauth.client.ClientContext;
+import com.paraview.oauth.context.ClientContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +21,7 @@ public class AuthConfig implements InitializingBean{
                     .setClientId("zhangsan")
                     .setClientSecret("123")
                     .setAuthorizeType("password,authorization_code")
+                    .setExpireTime(60 * 60 * 1000) // 1分钟有效时间
                 .and()
                 .create()
                     .setClientId("lisi")

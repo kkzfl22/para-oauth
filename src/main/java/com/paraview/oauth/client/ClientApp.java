@@ -1,5 +1,7 @@
 package com.paraview.oauth.client;
 
+import com.paraview.oauth.context.ClientContext;
+
 public class ClientApp {
 
     /**
@@ -15,6 +17,11 @@ public class ClientApp {
      * 认证模式
      */
     private String authorizeType;
+
+    /**
+     * 过期时间
+     */
+    private long expireTime = 60 * 60 * 1000;
 
     private ClientContext context;
 
@@ -53,6 +60,15 @@ public class ClientApp {
 
     public ClientContext and() {
         return this.context;
+    }
+
+    public long getExpireTime() {
+        return expireTime;
+    }
+
+    public ClientApp setExpireTime(long expireTime) {
+        this.expireTime = expireTime;
+        return this;
     }
 
 }

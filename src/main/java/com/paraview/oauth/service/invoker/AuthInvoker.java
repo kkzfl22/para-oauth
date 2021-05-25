@@ -8,7 +8,7 @@ public interface AuthInvoker {
 
     String grantType();
 
-    Token doInvoker(OAuthReq req);
+    Token doInvoker(OAuthReq req, ClientApp clientApp);
 
     boolean checkAuth(ClientApp clientApp);
 

@@ -21,7 +21,7 @@ public class TestCacheKeyValue {
         instance.put("11", "22");
         Assertions.assertEquals(instance.get("11"), "22");
         //执行保存
-        instance.DefaultSave();
+        instance.defaultSave();
         //加载
         instance.defaultLoader();
         Assertions.assertEquals(instance.get("11"), "22");

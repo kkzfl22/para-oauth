@@ -42,9 +42,14 @@ public class CacheKeyValue<K, V> {
     private static final String DEFAULT_PATH = "./";
 
     /**
+     * 默认后缀名
+     */
+    private static final String DEFAULT_NAME = ".dataStore.buffMap";
+
+    /**
      * 后缀名
      */
-    private static final String DEFAULT_NAME = "dataStore.buffMap";
+    private String dataStore;
 
     /**
      * 默认缓存分流大小
@@ -72,7 +77,14 @@ public class CacheKeyValue<K, V> {
      * 构造一个默认大小分流方式的缓存器
      */
     public CacheKeyValue() {
-        this(DEFAULT_CORE_POOL_SIZE);
+        this(DEFAULT_CORE_POOL_SIZE, DEFAULT_NAME);
+    }
+
+    /**
+     * 构造一个默认大小分流方式的缓存器
+     */
+    public CacheKeyValue(String dataStore) {
+        this(DEFAULT_CORE_POOL_SIZE, dataStore);
     }
 
     /**
@@ -80,8 +92,9 @@ public class CacheKeyValue<K, V> {
      *
      * @param corePoolSize 初始化分流器值
      */
-    public CacheKeyValue(int corePoolSize) {
+    public CacheKeyValue(int corePoolSize, String dataStore) {
         this.corePoolSize = tableSizeFor(corePoolSize);
+        this.dataStore = dataStore;
         mapCache = new ConcurrentHashMap[this.corePoolSize];
         for (int i = 0; i < this.corePoolSize; i++) {
             mapCache[i] = new ConcurrentHashMap<>(INIT_MAP_SIZE);
@@ -175,7 +188,7 @@ public class CacheKeyValue<K, V> {
      * 默认的文件路径读取
      */
     public void defaultLoader() {
-        InputStream inputStream = getFileInputStream(DEFAULT_PATH + DEFAULT_NAME);
+        InputStream inputStream = getFileInputStream(DEFAULT_PATH + dataStore);
         //如果为空，则跳过
         if (null == inputStream) {
             return;
@@ -250,8 +263,8 @@ public class CacheKeyValue<K, V> {
     /**
      * 默认文件的输出操作
      */
-    public void DefaultSave() {
-        this.save(DEFAULT_PATH, DEFAULT_NAME);
+    public void defaultSave() {
+        this.save(DEFAULT_PATH, dataStore);
     }
 
 
@@ -287,4 +300,5 @@ public class CacheKeyValue<K, V> {
     public ConcurrentHashMap<K, V>[] getMapCache() {
         return mapCache;
     }
+
 }

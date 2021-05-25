@@ -17,5 +17,6 @@ public class OAuthReq {
     private String redirect_uri;
     private String scope;
     private String authorization;
-
+    private String token;
+    private String code;
 }
