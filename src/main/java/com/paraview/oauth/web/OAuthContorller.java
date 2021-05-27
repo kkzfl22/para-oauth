@@ -30,12 +30,14 @@ public class OAuthContorller {
     @PostMapping("/token")
     public Mono<Token> token(OAuthReq req, ServerWebExchange exchange) {
         req.setAuthorization(exchange.getRequest().getHeaders().getFirst("Authorization"));
-        Token token = oAuthService.doAuth(req);
-        if (token != null) {
-            ResponseCookie responseCookie = ResponseCookie.from("oauth-token", token.getAccess_token()).build();
-            exchange.getResponse().addCookie(responseCookie);
-        }
-        return Mono.just(token);
+        return Mono.fromSupplier(() ->{
+            Token token = oAuthService.doAuth(req);
+            if (token != null) {
+                ResponseCookie responseCookie = ResponseCookie.from("oauth-token", token.getAccess_token()).build();
+                exchange.getResponse().addCookie(responseCookie);
+            }
+            return token;
+        });
     }
 
     /**
@@ -44,13 +46,16 @@ public class OAuthContorller {
      * 这块我们演示场景为：已经有用户登入了，登入信息放入了cookie，我们直观从cookie拿到当前用户的token就行
      */
     @GetMapping("/authorize")
-    public void authorize(OAuthReq req, ServerWebExchange exchange) {
-        //从 cookie获取当前登入信息
-        String token = exchange.getRequest().getCookies().getFirst("oauth-token").getValue();
-        req.setToken(token);
-        String code = oAuthService.makeCode(req);
-        exchange.getResponse().setStatusCode(HttpStatus.FOUND);
-        exchange.getResponse().getHeaders().setLocation(URI.create(req.getRedirect_uri() + "&code=" + code+"&state=" + req.getState()));
+    public Mono<String> authorize(OAuthReq req, ServerWebExchange exchange) {
+        return Mono.fromSupplier(() -> {
+            //从 cookie获取当前登入信息
+            String token = exchange.getRequest().getCookies().getFirst("oauth-token").getValue();
+            req.setToken(token);
+            String code = oAuthService.makeCode(req);
+            exchange.getResponse().setStatusCode(HttpStatus.FOUND);
+            exchange.getResponse().getHeaders().setLocation(URI.create(req.getRedirect_uri() + "&code=" + code+"&state=" + req.getState()));
+            return null;
+        });
     }
 
     @GetMapping("/reviceCode")
