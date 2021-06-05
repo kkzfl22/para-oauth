@@ -21,7 +21,7 @@ public class AuthConfig implements InitializingBean{
                     .setClientId("zhangsan")
                     .setClientSecret("123")
                     .setAuthorizeType("password,authorization_code")
-                    .setExpireTime(60 * 60 * 1000) // 1分钟有效时间
+                    .setExpireTime(60 * 60 * 1000)
                 .and()
                 .create()
                     .setClientId("lisi")

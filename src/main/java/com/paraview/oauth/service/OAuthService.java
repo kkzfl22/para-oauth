@@ -39,24 +39,24 @@ public class OAuthService {
         ClientApp clientApp = context.checkHeader(req.getAuthorization());
         AuthInvoker authInvoker = getInvoker(req.getGrant_type());
         if (authInvoker == null) {
-            throw new AuthException("授权类型不正确，请检查grant_type.");
+            throw new AuthException("grant_type error.");
         }
         if (!authInvoker.checkAuth(clientApp)) {
-            throw new AuthException("客户端应用无权限访问.");
+            throw new AuthException("client no permission.");
         }
         return authInvoker.doInvoker(req, clientApp);
     }
 
     public String makeCode(OAuthReq req) {
         if (ObjectUtil.isEmpty(req.getToken())) {
-            throw new AuthException("当前未登入.");
+            throw new AuthException("not login.");
         }
         if (!"code".equalsIgnoreCase(req.getResponse_type())) {
-            throw new AuthException("response_type必须为code");
+            throw new AuthException("response_type must be code");
         }
         ClientApp clientApp = context.getClient(req.getClient_id());
         if(clientApp == null){
-            throw new AuthException("客户端不存在");
+            throw new AuthException("client not exists");
         }
         User user = CacheContext.getTokenCache().get(req.getToken());
         String code = generateCode();

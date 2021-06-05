@@ -29,10 +29,11 @@ public class AuthorizationCodeInvoker implements AuthInvoker {
     public Token doInvoker(OAuthReq req, ClientApp clientApp) {
         User user = CacheContext.getCodeCache().get(req.getCode());
         if(user == null){
-            throw new AuthException("授权码不正确.");
+            throw new AuthException("code error.");
         }
         Token token = new Token(AuthType.BEARER.value(), 3600);
         CacheContext.getTokenCache().put(token.getAccess_token(), user);
+        CacheContext.getCodeCache().remove(req.getCode());
         return token;
     }
 

@@ -1,9 +1,7 @@
 package com.paraview.oauth.context;
 
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.paraview.oauth.bean.Token;
 import com.paraview.oauth.client.ClientApp;
 import com.paraview.oauth.enums.AuthType;
 import com.paraview.oauth.enums.AuthorizeType;
@@ -34,27 +32,27 @@ public class ClientContext {
     }
 
     public ClientApp checkHeader(String auth) {
-        if (ObjectUtil.isEmpty(auth)) {
-            throw new AuthException("client校验失败，没有header头信息");
+        if (auth == null) {
+            throw new AuthException("client check error,no header");
         }
-        if (!auth.toLowerCase().startsWith(AuthType.BASIC.value().toLowerCase())) {
-            throw new AuthException("认证模式不对，需要使用:" + AuthType.BASIC.value());
+        if (!auth.startsWith(AuthType.BASIC.value())) {
+            throw new AuthException("please use :" + AuthType.BASIC.value());
         }
         String[] data = auth.split(String.valueOf(StrUtil.C_SPACE));
         if (data.length < 2) {
-            throw new AuthException("client校验失败，没有client信息");
+            throw new AuthException("client check error,no client");
         }
         String clientStr = Base64.decodeStr(data[1]);
         if (!clientStr.contains(StrUtil.COLON)) {
-            throw new AuthException("client格式不正确!");
+            throw new AuthException("client format error!");
         }
         String[] clientInfo = clientStr.split(StrUtil.COLON);
         ClientApp clientApp = clients.get(clientInfo[0]);
         if (clientApp == null) {
-            throw new AuthException("客户端不存在,请联系管理员!");
+            throw new AuthException("not exists client!");
         }
         if (!clientInfo[1].equals(clientApp.getClientSecret())) {
-            throw new AuthException("认证失败,密码错误!");
+            throw new AuthException("client password error!");
         }
         return clientApp;
     }
@@ -72,20 +70,21 @@ public class ClientContext {
     }
 
     public boolean checkType(String authorizeType) {
-        if (ObjectUtil.isEmpty(authorizeType)) {
-            throw new AuthException("授权类型不能为空");
+        if (authorizeType == null) {
+            throw new AuthException("authorizeType can not be null");
         }
         for (String type : authorizeType.split(String.valueOf(StrUtil.C_COMMA))) {
             if (!ALL_SUPPORT_TYPE.contains(type)) {
-                throw new AuthException(String.format("不支持[%s]这种类型", type));
+                throw new AuthException(String.format("no support [%s]", type));
             }
         }
         return true;
     }
 
     public ClientApp getClient(String clientId) {
-        if(ObjectUtil.isEmpty(clientId))
+        if (clientId == null) {
             return null;
+        }
         return clients.get(clientId);
     }
 

@@ -30,12 +30,15 @@ public class CacheContext {
     }
 
     public static void save() {
-        if (userCache != null)
+        if (userCache != null){
             userCache.defaultSave();
-        if (tokenCache != null)
+        }
+        if (tokenCache != null) {
             tokenCache.defaultSave();
-        if (codeCache != null)
+        }
+        if (codeCache != null) {
             codeCache.defaultSave();
+        }
     }
 
 }

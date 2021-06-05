@@ -39,7 +39,7 @@ public class CacheKeyValue<K, V> {
     /**
      * 系统的默认路径
      */
-    private static final String DEFAULT_PATH = "./";
+    private static final String DEFAULT_PATH = System.getProperty("user.home") + "/oauth-cache/";
 
     /**
      * 默认后缀名

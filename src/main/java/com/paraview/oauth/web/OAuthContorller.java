@@ -29,8 +29,8 @@ public class OAuthContorller {
      */
     @PostMapping("/token")
     public Mono<Token> token(OAuthReq req, ServerWebExchange exchange) {
-        req.setAuthorization(exchange.getRequest().getHeaders().getFirst("Authorization"));
         return Mono.fromSupplier(() ->{
+            req.setAuthorization(exchange.getRequest().getHeaders().getFirst("Authorization"));
             Token token = oAuthService.doAuth(req);
             if (token != null) {
                 ResponseCookie responseCookie = ResponseCookie.from("oauth-token", token.getAccess_token()).build();
