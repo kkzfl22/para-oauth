@@ -1,3 +1,6 @@
 server:
   port: 9999
   shutdown: graceful #优雅关机
+  netty:
+    initial-buffer-size: 256B
+    max-initial-line-length: 8KB

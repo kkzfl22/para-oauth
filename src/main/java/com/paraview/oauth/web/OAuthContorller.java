@@ -47,15 +47,22 @@ public class OAuthContorller {
      */
     @GetMapping("/authorize")
     public Mono<String> authorize(OAuthReq req, ServerWebExchange exchange) {
-        return Mono.fromSupplier(() -> {
-            //从 cookie获取当前登入信息
-            String token = exchange.getRequest().getCookies().getFirst("oauth-token").getValue();
-            req.setToken(token);
-            String code = oAuthService.makeCode(req);
-            exchange.getResponse().setStatusCode(HttpStatus.FOUND);
-            exchange.getResponse().getHeaders().setLocation(URI.create(req.getRedirect_uri() + "&code=" + code+"&state=" + req.getState()));
-            return null;
-        });
+//        return Mono.fromSupplier(() -> {
+//            //从 cookie获取当前登入信息
+//            String token = exchange.getRequest().getCookies().getFirst("oauth-token").getValue();
+//            req.setToken(token);
+//            String code = oAuthService.makeCode(req);
+//            exchange.getResponse().setStatusCode(HttpStatus.FOUND);
+//            exchange.getResponse().getHeaders().setLocation(URI.create(req.getRedirect_uri() + "&code=" + code + "&state=" + req.getState()));
+//            return null;
+//        });
+        //从 cookie获取当前登入信息
+        String token = exchange.getRequest().getCookies().getFirst("oauth-token").getValue();
+        req.setToken(token);
+        String code = oAuthService.makeCode(req);
+        exchange.getResponse().setStatusCode(HttpStatus.FOUND);
+        exchange.getResponse().getHeaders().setLocation(URI.create(req.getRedirect_uri() + "&code=" + code + "&state=" + req.getState()));
+        return null;
     }
 
     @GetMapping("/reviceCode")

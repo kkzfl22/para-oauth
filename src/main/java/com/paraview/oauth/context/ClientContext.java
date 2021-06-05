@@ -6,6 +6,7 @@ import com.paraview.oauth.client.ClientApp;
 import com.paraview.oauth.enums.AuthType;
 import com.paraview.oauth.enums.AuthorizeType;
 import com.paraview.oauth.exception.AuthException;
+import com.paraview.oauth.utils.StringUtil;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,7 +36,7 @@ public class ClientContext {
         if (auth == null) {
             throw new AuthException("client check error,no header");
         }
-        if (!auth.startsWith(AuthType.BASIC.value())) {
+        if (!StringUtil.startWith(auth,AuthType.BASIC.value())) {
             throw new AuthException("please use :" + AuthType.BASIC.value());
         }
         String[] data = auth.split(String.valueOf(StrUtil.C_SPACE));

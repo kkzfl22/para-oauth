@@ -1,35 +1,27 @@
 package com.paraview;
 
-import cn.hutool.core.util.StrUtil;
-import com.paraview.oauth.context.CacheContext;
-import com.paraview.oauth.enums.AuthType;
-import com.paraview.oauth.exception.AuthException;
+import cn.hutool.http.HttpRequest;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MyTest {
 
     public static void main(String[] args) {
-
-//        CacheContext.init();
-//        long s1 = System.nanoTime();
-//        CacheContext.getUserCache().get("user1000");
-//        long s2 = System.nanoTime();
-//        System.out.println("耗时:" + (s2 - s1));
-        String auth = "Basic emhhbmdzYW46MTIz";
-        long s1 = System.nanoTime();
-        if (!auth.startsWith(AuthType.BASIC.value())) {
-            throw new AuthException("please use :" + AuthType.BASIC.value());
+        Map param = new HashMap();
+        param.put("username", "user1");
+        param.put("grant_type", "password");
+        param.put("password", "000000");
+        long t1 = System.nanoTime();
+        for (int i = 0; i < 10000; i++) {
+            HttpRequest.post("http://localhost:9999/oauth/token")
+                    .header("Authorization", "Basic emhhbmdzYW46MTIz")
+                    .form(param)
+                    .execute()
+                    .body();
         }
-        long s2 = System.nanoTime();
-        System.out.println("耗时:" + (s2 - s1));
-
-        long s3 = System.nanoTime();
-        String[] data = auth.split(String.valueOf(StrUtil.C_SPACE));
-        if (data.length < 2) {
-            throw new AuthException("client check error,no client");
-        }
-        long s4 = System.nanoTime();
-        System.out.println("耗时:" + (s4 - s3));
-
+        long t2 = System.nanoTime();
+        System.out.println("耗时:" + (t2 - t1));
     }
 
 }
